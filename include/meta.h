@@ -120,6 +120,7 @@ namespace Prismatic{
             nyquistSampling		  = false; //
             importPotential       = false;
             importSMatrix         = false;
+            importExtraPotential  = false;
             userSpecifiedNumFP    = false;
             saveComplexOutputWave = false; //
             arbitraryProbes       = false;
@@ -148,7 +149,7 @@ namespace Prismatic{
         size_t fpNum; // current frozen phonon number
         T sliceThickness; // thickness of slice in Z
         size_t zSampling; //oversampling of potential in Z direction
-        size_t numSlices; //number of slices to itereate through in multislice before giving an output
+        size_t numSlices; //number of slices to iterate through in multislice before giving an output
         T zStart; //Z coordinate of cell where multislice intermediate output will begin outputting
         T probeStepX;
         T probeStepY;
@@ -218,6 +219,7 @@ namespace Prismatic{
         bool nyquistSampling;
         bool importPotential;
         bool importSMatrix;
+        bool importExtraPotential;
         bool userSpecifiedNumFP;
         bool saveComplexOutputWave;
         bool arbitraryProbes;
@@ -341,6 +343,7 @@ namespace Prismatic{
         std::cout << "nyquistSampling = " << nyquistSampling << std::endl;
         std::cout << "importPotential = " << importPotential << std::endl;
         std::cout << "importSMatrix = " << importSMatrix << std::endl;
+        std::cout << "importExtraPotential = " << importExtraPotential << std::endl;
         if(importPotential || importSMatrix)
         {
             std::cout << "importFile = " << importFile << std::endl;
@@ -445,6 +448,7 @@ namespace Prismatic{
         if(nyquistSampling != other.nyquistSampling)return false;
         if(importPotential != other.importPotential)return false;
         if(importSMatrix != other.importSMatrix)return false;
+        if(importExtraPotential != other.importExtraPotential)return false;
         if(userSpecifiedNumFP != other.userSpecifiedNumFP)return false;
         if(saveComplexOutputWave != other.saveComplexOutputWave)return false;
         if(arbitraryProbes != other.arbitraryProbes)return false;

@@ -104,7 +104,8 @@ void printHelp()
               << "* --nyquist-sampling (-nqs) bool=false : Set number of probe positions at Nyquist sampling limit (default: Off)]\n"
               << "* --import-potential (-ips) bool=false : Use precalculated projected potential from import HDF5 file. Must specify -if and -idp (default: Off)]\n"
               << "* --import-smatrix (-ism) bool=false : Use precalculated scattering matrix from import HDF5 file -if and -idp (default: Off)]\n"
-              << "* --import-file (-if) filename : File from where to import precalculated potential or smatrix(default: Off)]\n"
+              << "* --import-extra-potential (-iep) bool=false : Add an additional projected potential from import HDF5 file (-if, -idp) to the calculated potential. Cannot import anything else at the same time. (default: Off)\n"
+              << "* --import-file (-if) filename : File from where to import precalculated potential or smatrix or additional potential(default: Off)]\n"
               << "* --import-data-path (-idp) string : Datapath from where precalcualted values are retrieved within HDF5 import file (default: none, uses Prismatic save path)\n"
               << "* --xtilt-tem (-xtt) min max step : plane wave tilt selection for HRTEM in x (in mrad) (default: " << defaults.minXtilt * 1000 << " " << defaults.maxXtilt * 1000 << " " << defaults.xTiltStep * 1000 << ")\n"
               << "* --ytilt-tem (-ytt) min max step : plane wave tilt selection for HRTEM in y (in mrad) (default: " << defaults.minYtilt * 1000 << " " << defaults.maxYtilt * 1000 << " " << defaults.yTiltStep * 1000 << ")\n"
@@ -293,6 +294,7 @@ bool writeParamFile(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
     f << "--save-probe:" << int(meta.saveProbe) + int(meta.saveProbeComplex) << "\n"; // should be safe since saveProbeComplex can't be set independently
     f << "--import-potential:" << meta.importPotential << "\n";
     f << "--import-smatrix:" << meta.importSMatrix << "\n";
+    f << "--import-extra-potential:" << meta.importExtraPotential << "\n";
     f << "--nyquist-sampling:"<< meta.nyquistSampling <<"\n";
 
 #ifdef PRISMATIC_ENABLE_GPU
@@ -1464,6 +1466,21 @@ bool parse_ism(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
     return true;
 };
 
+
+bool parse_iep(Metadata<PRISMATIC_FLOAT_PRECISION>& meta,
+    int& argc, const char*** argv)
+{
+    if (argc < 2)
+    {
+        cout << "No value provided for -iep (syntax is -iep bool)\n";
+        return false;
+    }
+    meta.importSMatrix = std::string((*argv)[1]) == "0" ? false : true;
+    argc -= 2;
+    argv[0] += 2;
+    return true;
+};
+
 bool parse_xtt(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
              int &argc, const char ***argv)
 {
@@ -1810,7 +1827,8 @@ static std::map<std::string, parseFunction> parser{
     {"--save-complex", parse_com}, {"-com", parse_com},
     {"--save-probe", parse_probe}, {"-probe", parse_probe},
     {"--import-potential", parse_ips}, {"-ips", parse_ips},
-    {"--import-smatrix", parse_ism}, {"-ism", parse_ism}
+    {"--import-smatrix", parse_ism}, {"-ism", parse_ism},
+    {"--import-extra-potential", parse_iep}, {"-iep", parse_iep}
     };
 bool parseInput(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
                 int &argc, const char ***argv)
