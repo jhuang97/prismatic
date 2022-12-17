@@ -1241,6 +1241,15 @@ void writeMetadata(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 	{
 		writeScalarAttribute(sim_params, "if", pars.meta.importFile);
 		writeScalarAttribute(sim_params, "idp", pars.meta.importPath);
+
+		H5std_string extraPotentialType;
+		if (pars.meta.extraPotentialType == ExtraPotentialType::Angle) {
+			extraPotentialType = "a";
+		}
+		else if (pars.meta.extraPotentialType == ExtraPotentialType::ProjectedPotential) {
+			extraPotentialType = "p";
+		}
+		writeScalarAttribute(sim_params, "ept", extraPotentialType);
 	}
 
 	//create scalar int attributes
@@ -1264,6 +1273,7 @@ void writeMetadata(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 	writeScalarAttribute(sim_params, "com", (int) pars.meta.saveComplexOutputWave);
 	writeScalarAttribute(sim_params, "ip", (int) pars.meta.importPotential);
 	writeScalarAttribute(sim_params, "ism", (int) pars.meta.importSMatrix);
+	writeScalarAttribute(sim_params, "iep", (int) pars.meta.importExtraPotential);
 	writeScalarAttribute(sim_params, "probe", (int) pars.meta.saveProbe);
 	writeScalarAttribute(sim_params, "mrf", (int) pars.meta.matrixRefocus);
 	writeScalarAttribute(sim_params, "abs", (int) pars.meta.arbitraryAberrations);
@@ -1294,6 +1304,7 @@ void writeMetadata(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 	writeScalarAttribute(sim_params, "ty", pars.meta.probeYtilt * 1000);
 	writeScalarAttribute(sim_params, "rs", pars.meta.randomSeed);
 	writeScalarAttribute(sim_params, "4DA", pars.meta.crop4Damax * 1000);
+	writeScalarAttribute(sim_params, "epf", pars.meta.extraPotentialFactor);
 
 	writeScalarAttribute(sim_params, "lambda", pars.lambda);
 	writeScalarAttribute(sim_params, "eff_pixel_size_x", pars.pixelSize[1]* (PRISMATIC_FLOAT_PRECISION) 2.0);

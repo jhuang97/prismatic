@@ -25,6 +25,7 @@ namespace Prismatic{
 
     enum class StreamingMode{Stream, SingleXfer, Auto};
     enum class TiltSelection{Rectangular, Radial};
+    enum class ExtraPotentialType{Angle, ProjectedPotential};
 
     template <class T>
     class Metadata{
@@ -121,6 +122,8 @@ namespace Prismatic{
             importPotential       = false;
             importSMatrix         = false;
             importExtraPotential  = false;
+            extraPotentialFactor  = 1.0;
+            extraPotentialType    = ExtraPotentialType::Angle;
             userSpecifiedNumFP    = false;
             saveComplexOutputWave = false; //
             arbitraryProbes       = false;
@@ -220,6 +223,8 @@ namespace Prismatic{
         bool importPotential;
         bool importSMatrix;
         bool importExtraPotential;
+        T extraPotentialFactor;
+        ExtraPotentialType extraPotentialType;
         bool userSpecifiedNumFP;
         bool saveComplexOutputWave;
         bool arbitraryProbes;
@@ -344,10 +349,19 @@ namespace Prismatic{
         std::cout << "importPotential = " << importPotential << std::endl;
         std::cout << "importSMatrix = " << importSMatrix << std::endl;
         std::cout << "importExtraPotential = " << importExtraPotential << std::endl;
-        if(importPotential || importSMatrix)
+        if(importPotential || importSMatrix || importExtraPotential)
         {
             std::cout << "importFile = " << importFile << std::endl;
             std::cout << "importPath = " << importPath << std::endl;
+        }
+        if (importExtraPotential) {
+            std::cout << "extraPotentialFactor = " << extraPotentialFactor << std::endl;
+            if (extraPotentialType == ExtraPotentialType::Angle) {
+                std::cout << "Extra Potential Type : Angle" << std::endl;
+            }
+            else {
+                std::cout << "Extra Potential Type : Projected Potential" << std::endl;
+            }
         }
         std::cout << "userSpecifiedNumFP = " << userSpecifiedNumFP << std::endl;
         std::cout << "saveComplexOutputWave = " << saveComplexOutputWave << std::endl;
@@ -449,6 +463,8 @@ namespace Prismatic{
         if(importPotential != other.importPotential)return false;
         if(importSMatrix != other.importSMatrix)return false;
         if(importExtraPotential != other.importExtraPotential)return false;
+        if (extraPotentialFactor != other.extraPotentialFactor)return false;
+        if (extraPotentialType != other.extraPotentialType)return false;
         if(userSpecifiedNumFP != other.userSpecifiedNumFP)return false;
         if(saveComplexOutputWave != other.saveComplexOutputWave)return false;
         if(arbitraryProbes != other.arbitraryProbes)return false;

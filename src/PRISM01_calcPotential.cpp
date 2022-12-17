@@ -616,6 +616,11 @@ void PRISM01_calcPotential(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 		generateProjectedPotentials(pars, potentialLookup, unique_species, xvec, yvec);
 	}
 
+	if (pars.meta.importExtraPotential)
+	{
+		std::cout << "Importing extra potential not yet implemented." << std::endl;
+	}
+
 	if (pars.meta.savePotentialSlices) 
 	{
 		std::cout << "Writing potential slices to output file." << std::endl;
