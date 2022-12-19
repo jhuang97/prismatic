@@ -1886,6 +1886,8 @@ static std::map<std::string, parseFunction> parser{
     {"--aberrations", parse_aber}, {"-aber", parse_aber},
     {"--save-complex", parse_com}, {"-com", parse_com},
     {"--save-probe", parse_probe}, {"-probe", parse_probe},
+    {"--import-file", parse_if}, {"-if", parse_if},
+    {"--import-data-path", parse_idp}, {"-idp", parse_idp},
     {"--import-potential", parse_ips}, {"-ips", parse_ips},
     {"--import-smatrix", parse_ism}, {"-ism", parse_ism},
     {"--import-extra-potential", parse_iep}, {"-iep", parse_iep},

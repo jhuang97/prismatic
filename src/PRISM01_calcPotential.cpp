@@ -618,7 +618,8 @@ void PRISM01_calcPotential(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 
 	if (pars.meta.importExtraPotential)
 	{
-		std::cout << "Importing extra potential not yet implemented." << std::endl;
+		std::cout << "Importing extra potential." << std::endl;
+		addExtraPotential(pars);
 	}
 
 	if (pars.meta.savePotentialSlices) 
@@ -645,7 +646,7 @@ void PRISM01_importPotential(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 		}
 
 		//initailize array and get data in right order
-		pars.pot = zeros_ND<3, PRISMATIC_FLOAT_PRECISION>({{tmp_pot.get_dimi(), tmp_pot.get_dimj(), tmp_pot.get_dimk()}});
+		pars.pot = zeros_ND<3, PRISMATIC_FLOAT_PRECISION>({{tmp_pot.get_dimi(), tmp_pot.get_dimj(), tmp_pot.get_dimk()}});  // the dimensions (k, j, i) are reversed here
 		for(auto i = 0; i < tmp_pot.get_dimi(); i++)
 		{
 			for(auto j = 0; j < tmp_pot.get_dimj(); j++)
@@ -701,6 +702,112 @@ void PRISM01_importPotential(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 	}
 
 };
+
+void addExtraPotential(Parameters<PRISMATIC_FLOAT_PRECISION>& pars) {
+	Array3D<PRISMATIC_FLOAT_PRECISION> imported_slices;
+	Array1D<PRISMATIC_FLOAT_PRECISION> z_imported;
+
+	//scope out imported tmp_pot as soon as possible
+	{
+		Array3D<PRISMATIC_FLOAT_PRECISION> tmp_pot;
+		if (pars.meta.importPath.size() > 0)
+		{
+			readRealDataSet_inOrder(tmp_pot, pars.meta.importFile, pars.meta.importPath + "/data");
+			readRealDataSet_inOrder(z_imported, pars.meta.importFile, pars.meta.importPath + "/dim3");
+		}
+		else //read default path
+		{
+			std::string groupPath = "extra_potential_slices";
+			readRealDataSet_inOrder(tmp_pot, pars.meta.importFile, groupPath + "/data");
+			readRealDataSet_inOrder(z_imported, pars.meta.importFile, groupPath + "/dim3");
+		}
+
+		// assume that the extra potential slices do not need to be tiled in x/y
+
+		// Convention for ND arrays is                  dimk: z, dimj: y, dimi: x.  However,
+		// Convention for HDF5 datasets is opposite:       x,       y,       z
+		// imageSize[0] y, imageSize[1] x
+		if (tmp_pot.get_dimk() != pars.imageSize[1] || tmp_pot.get_dimj() != pars.imageSize[0]) {
+			throw std::runtime_error("Number of pixels in x/y direction is not consistent between the calculated and extra imported potential.\n");
+		}
+		if (tmp_pot.get_dimi() != z_imported.get_dimi()) {
+			throw std::runtime_error("Wrong number of z coordinates provided.\n");
+		}
+
+		PRISMATIC_FLOAT_PRECISION pot_factor = 0.0;
+		if (pars.meta.extraPotentialType == ExtraPotentialType::Angle) {
+			pot_factor = pars.meta.extraPotentialFactor / pars.sigma;
+		}
+		else if (pars.meta.extraPotentialType == ExtraPotentialType::ProjectedPotential) {
+			pot_factor = pars.meta.extraPotentialFactor;
+		}
+		else {
+			throw std::runtime_error("Invalid ExtraPotentialType");
+		}
+
+		//initailize array and get data in right order
+		imported_slices = zeros_ND<3, PRISMATIC_FLOAT_PRECISION>({ {tmp_pot.get_dimi(), tmp_pot.get_dimj(), tmp_pot.get_dimk()} });  // the dimensions (k, j, i) are reversed here
+		for (auto i = 0; i < tmp_pot.get_dimi(); i++)
+		{
+			for (auto j = 0; j < tmp_pot.get_dimj(); j++)
+			{
+				for (auto k = 0; k < tmp_pot.get_dimk(); k++)
+				{
+					imported_slices.at(i, j, k) = tmp_pot.at(k, j, i) * pot_factor;
+				}
+			}
+		}
+	}
+
+	//std::cout << pars.meta.cellDim[0] << " " << pars.tiledCellDim[0] << " " << pars.meta.sliceThickness << std::endl;
+
+	std::transform(z_imported.begin(), z_imported.end(), z_imported.begin(), [&pars](PRISMATIC_FLOAT_PRECISION& t_z) {
+		return t_z / pars.meta.cellDim[0]; // convert to fractional coordinates
+	});
+
+	// Figure out which slices to add the extra potential to
+	// (We assume that the imported slices do need to be tiled in z)
+	std::vector<PRISMATIC_FLOAT_PRECISION> tiled_Z;
+	tiled_Z.reserve(z_imported.get_dimi() * pars.meta.tileZ);
+	std::vector<size_t> import_indices;
+	import_indices.reserve(z_imported.get_dimi() * pars.meta.tileZ);
+
+	for (auto tz = 0; tz < pars.meta.tileZ; ++tz) {
+		for (auto i = 0; i < z_imported.get_dimi(); ++i) {
+			import_indices.push_back(i);
+			tiled_Z.push_back((z_imported.at(i) + tz) / pars.meta.tileZ);
+		}
+	}
+
+	/*for (auto i : tiled_Z) std::cout << i << ' ';
+	std::cout << std::endl;
+	for (auto i : import_indices) std::cout << i << ' ';
+	std::cout << std::endl;*/
+	
+	// trying to be consistent with generateProjectedPotentials
+	std::transform(tiled_Z.begin(), tiled_Z.end(), tiled_Z.begin(), [&pars](PRISMATIC_FLOAT_PRECISION& t_z) {
+		return round((1.0 - t_z) * pars.tiledCellDim[0] / pars.meta.sliceThickness + 0.5) - 1;
+		});
+
+	//for (auto i : tiled_Z) std::cout << i << ' ';
+	//std::cout << std::endl;
+
+	// add the extra imported potential slices
+	std::cout << "Adding imported extra potential (from slice index -> to slice index)" << std::endl;
+	for (size_t to_slice = 0; to_slice < pars.numPlanes; ++to_slice) {
+		for (size_t i = 0; i < tiled_Z.size(); ++i) {
+			if (tiled_Z[i] == to_slice) {
+				size_t from_slice = import_indices[i];
+				std::cout << from_slice << " -> " << to_slice << std::endl;
+				for (auto jj = 0; jj < pars.pot.get_dimj(); ++jj) {
+					for (auto ii = 0; ii < pars.pot.get_dimi(); ++ii) {
+						pars.pot.at(to_slice, jj, ii) += imported_slices.at(from_slice, jj, ii);
+					}
+				}
+			}
+		}
+	}
+}
 
 void fourierResampling(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 {

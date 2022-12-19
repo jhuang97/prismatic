@@ -76,6 +76,8 @@ void PRISM01_calcPotential(Parameters<PRISMATIC_FLOAT_PRECISION> &pars);
 
 void PRISM01_importPotential(Parameters<PRISMATIC_FLOAT_PRECISION> &pars);
 
+void addExtraPotential(Parameters<PRISMATIC_FLOAT_PRECISION>& pars);
+
 void fourierResampling(Parameters<PRISMATIC_FLOAT_PRECISION> &pars);
 
 //#endif //PRISMATIC_ENABLE_GPU
