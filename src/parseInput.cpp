@@ -1664,7 +1664,7 @@ bool parse_maxFile(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
         cout << "No file size provided for --max-filesize (syntax is --max-filesize filesize)\n";
         return false;
     }
-    if ((meta.maxFileSize = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1])) * 1e9 == 0)
+    if ((meta.maxFileSize = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1]) * 1e9) == 0)
     {
         cout << "Invalid value \"" << (*argv)[1] << "\" provided for max file size (syntax is --max-filesize filesize)\n";
         return false;
