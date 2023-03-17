@@ -98,7 +98,7 @@ namespace Prismatic{
             probes_x              = {}; //
             probes_y              = {}; //
             srand(time(0));
-            randomSeed            = rand() % 100000; //
+            randomSeed            = (rand() << 15 | rand()) % 1000000; //
             crop4Damax            = 100.0 / 1000; //
             algorithm             = Algorithm::PRISM;
             potential3D           = true; //

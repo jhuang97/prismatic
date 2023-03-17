@@ -352,6 +352,7 @@ namespace Prismatic{
 		    std::cout << "deviceProperties.major = " << deviceProperties.major << std::endl;
 		    std::cout << "deviceProperties.maxThreadsPerBlock = " << deviceProperties.maxThreadsPerBlock << std::endl;
 		    std::cout << "targetNumBlocks = " << targetNumBlocks << std::endl;
+			std::cout << "RAND_MAX = " << RAND_MAX << std::endl;
 
 			#endif //PRISMATIC_ENABLE_GPU
 	    };

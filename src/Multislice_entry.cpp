@@ -130,7 +130,7 @@ void Multislice_entry_pars(Parameters<PRISMATIC_FLOAT_PRECISION> &pars){
 void Multislice_runFP(Parameters<PRISMATIC_FLOAT_PRECISION> &pars, size_t fpNum)
 {
 
-	pars.meta.randomSeed = rand() % 100000;
+	pars.meta.randomSeed = (rand() << 15 | rand()) % 1000000;
 	pars.meta.fpNum = fpNum;
 	cout << "Frozen Phonon #" << fpNum << endl;
 	pars.meta.toString();
@@ -182,7 +182,7 @@ void Multislice_runFP(Parameters<PRISMATIC_FLOAT_PRECISION> &pars, size_t fpNum)
 void Multislice_series_runFP(Parameters<PRISMATIC_FLOAT_PRECISION> &pars, size_t fpNum)
 {
 
-	pars.meta.randomSeed = rand() % 100000;
+	pars.meta.randomSeed = (rand() << 15 | rand()) % 1000000;
 	pars.meta.fpNum = fpNum;
 	cout << "Frozen Phonon #" << fpNum << endl;
 	pars.meta.toString();

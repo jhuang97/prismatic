@@ -123,7 +123,7 @@ void PRISM_entry_pars(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 
 void PRISM_runFP(Parameters<PRISMATIC_FLOAT_PRECISION> &pars, size_t fpNum)
 {
-	pars.meta.randomSeed = rand() % 100000;
+	pars.meta.randomSeed = (rand() << 15 | rand()) % 1000000;
 	pars.meta.fpNum = fpNum;
 	cout << "Frozen Phonon #" << fpNum << endl;
 	pars.meta.toString();
@@ -189,7 +189,7 @@ void PRISM_runFP(Parameters<PRISMATIC_FLOAT_PRECISION> &pars, size_t fpNum)
 
 void PRISM_series_runFP(Parameters<PRISMATIC_FLOAT_PRECISION> &pars, size_t fpNum)
 {
-	pars.meta.randomSeed = rand() % 100000;
+	pars.meta.randomSeed = (rand() << 15 | rand()) % 1000000;
 	pars.meta.fpNum = fpNum;
 	cout << "Frozen Phonon #" << fpNum << endl;
 	pars.meta.toString();

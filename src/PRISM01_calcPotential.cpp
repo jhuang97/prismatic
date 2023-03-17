@@ -189,9 +189,9 @@ void generateProjectedPotentials(Parameters<PRISMATIC_FLOAT_PRECISION> &pars,
 			size_t currentSlice, stop;
 			currentSlice = stop = 0;
             // create a random number generator to simulate thermal effects
-            std::cout << "random seed = " << pars.meta.randomSeed + t * 1000 << std::endl;
-            srand(pars.meta.randomSeed + 1000*t);
-            std::mt19937 de(pars.meta.randomSeed + 1000*t);
+            std::cout << "random seed = " << pars.meta.randomSeed + t * 10000 << std::endl;
+            srand(pars.meta.randomSeed + 10000*t);
+            std::mt19937 de(pars.meta.randomSeed + 10000*t);
             normal_distribution<PRISMATIC_FLOAT_PRECISION> randn(0, 1);
 
 			while (dispatcher.getWork(currentSlice, stop))
@@ -430,9 +430,9 @@ void generateProjectedPotentials3D(Parameters<PRISMATIC_FLOAT_PRECISION> &pars,
 			size_t currentAtom, stop;
 			currentAtom = stop = 0;
             // create a random number generator to simulate thermal effects
-            std::cout << "random seed = " << pars.meta.randomSeed + t * 1000 << std::endl;
-            srand(pars.meta.randomSeed+1000*t);
-            std::mt19937 de(pars.meta.randomSeed+1000*t);
+            std::cout << "random seed = " << pars.meta.randomSeed + t * 10000 << std::endl;
+            srand(pars.meta.randomSeed+10000*t);
+            std::mt19937 de(pars.meta.randomSeed+10000*t);
             normal_distribution<PRISMATIC_FLOAT_PRECISION> randn(0, 1);
 
 			while (dispatcher.getWork(currentAtom, stop))

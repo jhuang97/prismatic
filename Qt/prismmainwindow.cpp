@@ -2285,7 +2285,7 @@ void PRISMMainWindow::setStreamingMode(int val){
 }
 
 void PRISMMainWindow::newRandomSeed(){
-    PRISMATIC_FLOAT_PRECISION val = rand() % 100000;
+    PRISMATIC_FLOAT_PRECISION val = (rand() << 15 | rand()) % 1000000;
     ui->lineEdit_randomSeed->setText(QString::number(val));
     meta->randomSeed = val;
 }

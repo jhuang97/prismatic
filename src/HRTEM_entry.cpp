@@ -119,7 +119,7 @@ void HRTEM_entry_pars(Parameters<PRISMATIC_FLOAT_PRECISION>& pars)
 
 void HRTEM_runFP(Parameters<PRISMATIC_FLOAT_PRECISION> &pars, size_t fpNum)
 {
-	pars.meta.randomSeed = rand() % 100000;
+	pars.meta.randomSeed = (rand() << 15 | rand()) % 1000000;
 	pars.meta.fpNum = fpNum;
 	std::cout << "Frozen Phonon #" << fpNum << std::endl;
 	pars.meta.toString();
