@@ -1387,7 +1387,7 @@ void writeMetadata(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 		tot_attr.write(PFP_TYPE, tmp_buffer);
 	}
 
-	if(pars.meta.arbitraryProbes)
+	/*if(pars.meta.arbitraryProbes)
 	{
 		hsize_t numProbes[1] = {pars.meta.probes_x.size()};
 		H5::DataSpace probe_mspace(1, numProbes);
@@ -1396,7 +1396,7 @@ void writeMetadata(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 		probes_x_attr.write(PFP_TYPE, &pars.meta.probes_x[0]);
 		probes_y_attr.write(PFP_TYPE, &pars.meta.probes_y[0]);
 
-	}
+	}*/
 
 	//arbitrary aberrations
 	if(pars.meta.arbitraryAberrations)
