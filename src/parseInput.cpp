@@ -148,6 +148,11 @@ static inline std::string trim(std::string s)
     return std::string(s);
 }
 
+static bool parses_to_0_float(std::string s)
+{
+    return s == "0" || s == "0.0";
+}
+
 bool parseParamLine(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
                     std::string param_line)
 {
@@ -1007,7 +1012,7 @@ bool parse_rs(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
         cout << "No random seed provided for -rs (syntax is -rs integer)\n";
         return false;
     }
-    if (((meta.randomSeed = atoi((*argv)[1])) == 0) & std::string(((*argv)[1])) != "0")
+    if (((meta.randomSeed = atoi((*argv)[1])) == 0) && std::string(((*argv)[1])) != "0")
     {
         cout << "Invalid value \"" << (*argv)[1] << "\" provided for random seed (syntax is -rs integer)\n";
         return false;
@@ -1025,7 +1030,7 @@ bool parse_tx(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
         cout << "No probe tilt provided for -tx (syntax is -tx probe_tilt)\n";
         return false;
     }
-    if (((meta.probeXtilt = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1]) / 1000) == 0) & (std::string((*argv)[1]) != "0"))
+    if (((meta.probeXtilt = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1]) / 1000) == 0) && !parses_to_0_float(std::string((*argv)[1])))
     {
         cout << "Invalid value \"" << (*argv)[1] << "\" provided for -tx (syntax is -tx probe_tilt\n";
         return false;
@@ -1043,7 +1048,7 @@ bool parse_ty(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
         cout << "No probe tilt provided for -ty (syntax is -ty probe_tilt)\n";
         return false;
     }
-    if (((meta.probeYtilt = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1]) / 1000) == 0) & (std::string((*argv)[1]) != "0"))
+    if (((meta.probeYtilt = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1]) / 1000) == 0) && !parses_to_0_float(std::string((*argv)[1])))
     {
         cout << "Invalid value \"" << (*argv)[1] << "\" provided for -ty (syntax is -ty probe_tilt\n";
         return false;
@@ -1061,7 +1066,7 @@ bool parse_df(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
         cout << "No defocus value provided for -df (syntax is -df defocus_value (in Angstroms))\n";
         return false;
     }
-    if (((meta.probeDefocus = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1])) == 0) & (std::string((*argv)[1]) != "0"))
+    if (((meta.probeDefocus = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1])) == 0) && !parses_to_0_float(std::string((*argv)[1])))
     {
         cout << "Invalid value \"" << (*argv)[1] << "\" provided for -df (syntax is -df defocus_value (in Angstroms)\n";
         return false;
@@ -1079,7 +1084,7 @@ bool parse_C3(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
         cout << "No C3 value provided for -C3 (syntax is -C3 value (in Angstroms))\n";
         return false;
     }
-    if (((meta.C3 = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1])) == 0) & (std::string((*argv)[1]) != "0"))
+    if (((meta.C3 = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1])) == 0) && !parses_to_0_float(std::string((*argv)[1])))
     {
         cout << "Invalid value \"" << (*argv)[1] << "\" provided for -C3 (syntax is -C3 value (in Angstroms)\n";
         return false;
@@ -1097,7 +1102,7 @@ bool parse_C5(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
         cout << "No C5 value provided for -C5 (syntax is -C5 value (in Angstroms))\n";
         return false;
     }
-    if (((meta.C5 = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1])) == 0) & (std::string((*argv)[1]) != "0"))
+    if (((meta.C5 = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1])) == 0) && !parses_to_0_float(std::string((*argv)[1])))
     {
         cout << "Invalid value \"" << (*argv)[1] << "\" provided for -C5 (syntax is -C5 value (in Angstroms)\n";
         return false;
@@ -1137,12 +1142,12 @@ bool parse_wx(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
     minval = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1]);
     maxval = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[2]);
 
-    if ((minval == 0) & (std::string((*argv)[1]) != "0"))
+    if ((minval == 0) && !parses_to_0_float(std::string((*argv)[1])))
     {
         cout << "Invalid lower bound \"" << (*argv)[1] << "\" provided for scan window X (syntax is -wx min max (in fractional coordinates))\n";
         return false;
     }
-    if ((maxval == 0) & (std::string((*argv)[2]) != "0"))
+    if ((maxval == 0) && !parses_to_0_float(std::string((*argv)[2])))
     {
         cout << "Invalid upper bound \"" << (*argv)[2] << "\" provided for scan window X (syntax is -wx min max (in fractional coordinates))\n";
         return false;
@@ -1170,12 +1175,12 @@ bool parse_wy(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
     PRISMATIC_FLOAT_PRECISION minval, maxval;
     minval = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1]);
     maxval = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[2]);
-    if ((minval == 0) & (std::string((*argv)[1]) != "0"))
+    if ((minval == 0) && !parses_to_0_float(std::string((*argv)[1])))
     {
         cout << "Invalid lower bound \"" << (*argv)[1] << "\" provided for scan window y (syntax is -wx min max (in fractional coordinates))\n";
         return false;
     }
-    if ((maxval == 0) & (std::string((*argv)[2]) != "0"))
+    if ((maxval == 0) && !parses_to_0_float(std::string((*argv)[2])))
     {
         cout << "Invalid upper bound \"" << (*argv)[2] << "\" provided for scan window y (syntax is -wy min max (in fractional coordinates))\n";
         return false;
@@ -1204,12 +1209,12 @@ bool parse_wxr(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
     minval = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1]);
     maxval = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[2]);
 
-    if ((minval == 0) & (std::string((*argv)[1]) != "0"))
+    if ((minval == 0) && !parses_to_0_float(std::string((*argv)[1])))
     {
         cout << "Invalid lower bound \"" << (*argv)[1] << "\" provided for scan window Xr (syntax is -wxr min max (in Angstroms))\n";
         return false;
     }
-    if ((maxval == 0) & (std::string((*argv)[2]) != "0"))
+    if ((maxval == 0) && !parses_to_0_float(std::string((*argv)[2])))
     {
         cout << "Invalid upper bound \"" << (*argv)[2] << "\" provided for scan window Xr (syntax is -wxr min max (in Angstroms))\n";
         return false;
@@ -1242,12 +1247,12 @@ bool parse_wyr(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
     minval = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1]);
     maxval = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[2]);
 
-    if ((minval == 0) & (std::string((*argv)[1]) != "0"))
+    if ((minval == 0) && !parses_to_0_float(std::string((*argv)[1])))
     {
         cout << "Invalid lower bound \"" << (*argv)[1] << "\" provided for scan window Yr (syntax is -wyr min max (in Angstroms))\n";
         return false;
     }
-    if ((maxval == 0) & (std::string((*argv)[2]) != "0"))
+    if ((maxval == 0) && !parses_to_0_float(std::string((*argv)[2])))
     {
         cout << "Invalid upper bound \"" << (*argv)[2] << "\" provided for scan window Yr (syntax is -wyr min max (in Angstroms))\n";
         return false;
@@ -1319,7 +1324,7 @@ bool parse_2D(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
         return false;
     }
     meta.save2DOutput = true;
-    if ((string((*argv)[1]) != "0") & ((meta.integrationAngleMin = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1]) / 1000) == 0))
+    if (((meta.integrationAngleMin = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1]) / 1000) == 0) && !parses_to_0_float(std::string((*argv)[1])))
     {
         cout << "Invalid value \"" << (*argv)[1] << "\" provided for minimum integration angle (syntax is -2D ang_min ang_max (in mrad)\n";
         return false;
@@ -1384,9 +1389,9 @@ bool parse_4DA(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
         cout << "No angle value provided for -4DA (syntax is -4DA amax)\n";
         return false;
     }
-    if (((meta.crop4Damax = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1]) / 1000) == 0) & (std::string((*argv)[1]) != "0"))
+    if ((meta.crop4Damax = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1]) / 1000) == 0)
     {
-        cout << "Invalid value \"" << (*argv)[1] << "\" provided for -tx (syntax is -tx probe_tilt\n";
+        cout << "Invalid value \"" << (*argv)[1] << "\" provided for -4DA (syntax is -4DA amax)\n";
         return false;
     }
     argc -= 2;
@@ -1502,7 +1507,7 @@ bool parse_epf(Metadata<PRISMATIC_FLOAT_PRECISION>& meta,
         cout << "No value provided for -epf (syntax is -epf extra_factor (needs to be a real number))\n";
         return false;
     }
-    if (((meta.extraPotentialFactor = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1])) == 0) && (std::string((*argv)[1]) != "0"))
+    if (((meta.extraPotentialFactor = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1])) == 0) && !parses_to_0_float(std::string((*argv)[1])))
     {
         cout << "Invalid value \"" << (*argv)[1] << "\" provided for -epf (syntax is -epf extra_factor (needs to be a real number))\n";
         return false;
