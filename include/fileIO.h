@@ -12,10 +12,10 @@ struct complex_float_t
 
 struct aberration_t
 {
-    int m;
     int n;
-    PRISMATIC_FLOAT_PRECISION mag;
-    PRISMATIC_FLOAT_PRECISION angle;
+    int m;
+    PRISMATIC_FLOAT_PRECISION C_mag;
+    PRISMATIC_FLOAT_PRECISION phi;
 };
 
 

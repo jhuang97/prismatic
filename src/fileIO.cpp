@@ -1402,16 +1402,16 @@ void writeMetadata(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 	if(pars.meta.arbitraryAberrations)
 	{
 		H5::CompType ab_type = H5::CompType(sizeof(aberration_t));
-		const H5std_string m_string("m");
 		const H5std_string n_string("n");
-		const H5std_string mag_string("mag");
-		const H5std_string angle_string("angle");
+		const H5std_string m_string("m");
+		const H5std_string C_mag_string("C_mag");
+		const H5std_string phi_string("phi");
 		size_t oi = sizeof(int);
 		size_t of = sizeof(PRISMATIC_FLOAT_PRECISION);
-		ab_type.insertMember(m_string, 0, H5::PredType::NATIVE_INT);
-		ab_type.insertMember(n_string, oi, H5::PredType::NATIVE_INT);
-		ab_type.insertMember(mag_string, 2*oi, PFP_TYPE);
-		ab_type.insertMember(angle_string, 2*oi+of, PFP_TYPE);
+		ab_type.insertMember(n_string, 0, H5::PredType::NATIVE_INT);
+		ab_type.insertMember(m_string, oi, H5::PredType::NATIVE_INT);
+		ab_type.insertMember(C_mag_string, 2*oi, PFP_TYPE);
+		ab_type.insertMember(phi_string, 2*oi+of, PFP_TYPE);
 
 		hsize_t dim[1] = {pars.meta.aberrations.size()};
 		H5::DataSpace mspace(1,dim);

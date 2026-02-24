@@ -22,21 +22,21 @@
 
 struct aberration
 {
-    int m;
     int n;
-    PRISMATIC_FLOAT_PRECISION mag;
-    PRISMATIC_FLOAT_PRECISION angle;
+    int m;
+    PRISMATIC_FLOAT_PRECISION C_mag;
+    PRISMATIC_FLOAT_PRECISION phi;
     void to_string() const
     {
-        std::cout << "m = " << m << std::endl;
         std::cout << "n = " << n << std::endl;
-        std::cout << "mag = " << mag << std::endl;
-        std::cout << "angle = " << angle << std::endl;
+        std::cout << "m = " << m << std::endl;
+        std::cout << "C_mag = " << C_mag << std::endl;
+        std::cout << "phi = " << phi << std::endl;
     };
 
     bool operator==(const aberration &a) const
     {
-        return (m == a.m) && (n == a.n);
+        return (n == a.n) && (m == a.m);
     };
 };
 
