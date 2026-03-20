@@ -20,6 +20,11 @@
 #include "defines.h"
 #include <time.h>
 #include "aberration.h"
+#include <chrono>
+#include <cstdint>
+#include <random>
+#include <boost/random/ranlux.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
 
 namespace Prismatic{
 
@@ -98,7 +103,17 @@ namespace Prismatic{
             probes_x              = {}; //
             probes_y              = {}; //
             srand(time(0));
-            randomSeed            = (rand() << 15 | rand()) % 1000000; //
+            std::mt19937::result_type initial_seed = std::random_device()()
+                ^ std::chrono::duration_cast<std::chrono::seconds>(
+                    std::chrono::system_clock::now().time_since_epoch()
+                ).count()
+                ^ std::chrono::duration_cast<std::chrono::microseconds>(
+                    std::chrono::high_resolution_clock::now().time_since_epoch()
+                ).count();
+            std::cout << "Initial seed (automatically generated): " << initial_seed << std::endl;
+            rng = boost::ranlux3(initial_seed);
+            boost::random::uniform_int_distribution<uint32_t> dist;
+            randomSeed            = dist(rng); //
             crop4Damax            = 100.0 / 1000; //
             algorithm             = Algorithm::PRISM;
             potential3D           = true; //
@@ -139,6 +154,12 @@ namespace Prismatic{
             importFile            = "";
             importPath            = "";
         }
+        
+        void reseed() {
+            boost::random::uniform_int_distribution<uint32_t> dist;
+            randomSeed = dist(rng);
+        }
+
         size_t interpolationFactorY; // PRISM f_y parameter
         size_t interpolationFactorX; // PRISM f_x parameter
         std::string filenameAtoms; // filename of txt file containing atoms (x,y,z,Z CSV format -- one atom per line)
@@ -197,7 +218,8 @@ namespace Prismatic{
         T scanWindowYMax_r;
         std::vector<T> probes_x;
         std::vector<T> probes_y;
-        T randomSeed;
+        boost::ranlux3 rng;
+        uint32_t randomSeed;
         T crop4Damax;
         size_t numThreads; // number of CPU threads to use
         size_t numGPUs; // number of GPUs to use
@@ -444,6 +466,7 @@ namespace Prismatic{
         if(scanWindowXMax_r != other.scanWindowXMax_r)return false;
         if(scanWindowYMin_r != other.scanWindowYMin_r)return false;
         if(scanWindowYMax_r != other.scanWindowYMax_r)return false;
+        if(rng != other.rng)return false;
         if(randomSeed != other.randomSeed)return false;
         if(crop4Damax != other.crop4Damax)return false;
         if(includeThermalEffects != other.includeThermalEffects)return false;

@@ -1782,6 +1782,13 @@ void writeScalarAttribute(H5::H5Object &object, const std::string &name, const i
 	attr.write(H5::PredType::NATIVE_INT, &data);
 };
 
+void writeScalarAttribute(H5::H5Object& object, const std::string& name, const uint32_t& data)
+{
+	H5::DataSpace attr_dataspace(H5S_SCALAR);
+	H5::Attribute attr = object.createAttribute(name.c_str(), H5::PredType::NATIVE_UINT32, attr_dataspace);
+	attr.write(H5::PredType::NATIVE_UINT32, &data);
+};
+
 void writeScalarAttribute(H5::H5Object &object, const std::string &name, const PRISMATIC_FLOAT_PRECISION &data)
 {
 	H5::DataSpace attr_dataspace(H5S_SCALAR);

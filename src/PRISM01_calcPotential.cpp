@@ -19,8 +19,8 @@
 #include <cstring>
 #include <map>
 #include <vector>
-#include <random>
 #include <thread>
+#include <sstream>
 #include "params.h"
 #include "ArrayND.h"
 #include "projectedPotential.h"
@@ -29,6 +29,9 @@
 #include "fileIO.h"
 #include "fftw3.h"
 #include <complex>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/normal_distribution.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
 
 #ifdef PRISMATIC_BUILDING_GUI
 #include "prism_progressbar.h"
@@ -174,7 +177,6 @@ void generateProjectedPotentials(Parameters<PRISMATIC_FLOAT_PRECISION> &pars,
 	WorkDispatcher dispatcher(0, pars.numPlanes);
 	for (long t = 0; t < pars.meta.numThreads; ++t)
 	{
-		cout << "Launching thread #" << t << " to compute projected potential slices\n";
 		workers.push_back(thread([&pars, &x, &y, &z, &ID, &Z_lookup, &xvec, &sigma, &occ,
 								  &zPlane, &yvec, &potentialLookup, &dispatcher, &t]()
 		{
@@ -189,10 +191,17 @@ void generateProjectedPotentials(Parameters<PRISMATIC_FLOAT_PRECISION> &pars,
 			size_t currentSlice, stop;
 			currentSlice = stop = 0;
             // create a random number generator to simulate thermal effects
-            std::cout << "random seed = " << pars.meta.randomSeed + t * 10000 << std::endl;
-            srand(pars.meta.randomSeed + 10000*t);
-            std::mt19937 de(pars.meta.randomSeed + 10000*t);
-            normal_distribution<PRISMATIC_FLOAT_PRECISION> randn(0, 1);
+			unsigned int thread_seed = pars.meta.randomSeed + static_cast<unsigned int>(10000 * t);
+
+			std::ostringstream oss;
+			oss << "Launched thread #" << t << " to compute projected potential slices with seed " << thread_seed << std::endl;
+			std::cout << oss.str();
+
+            boost::mt19937 thread_rng(thread_seed);
+			PRISMATIC_FLOAT_PRECISION zero = 0.0;
+			PRISMATIC_FLOAT_PRECISION one = 1.0;
+            boost::random::normal_distribution<PRISMATIC_FLOAT_PRECISION> randn(zero, one);
+			boost::random::uniform_real_distribution<PRISMATIC_FLOAT_PRECISION> uniform_d01(zero, one);
 
 			while (dispatcher.getWork(currentSlice, stop))
 			{ // synchronously get work assignment
@@ -207,18 +216,17 @@ void generateProjectedPotentials(Parameters<PRISMATIC_FLOAT_PRECISION> &pars,
 						{
 							if (pars.meta.includeOccupancy)
 							{
-								if (static_cast<PRISMATIC_FLOAT_PRECISION>(rand()) / static_cast<PRISMATIC_FLOAT_PRECISION>(RAND_MAX) > occ[atom_num])
+								if (uniform_d01(thread_rng) > occ[atom_num])
 								{
 									continue;
 								}
 							}
-							//								if ( !pars.meta.includeOccupancy || static_cast<PRISMATIC_FLOAT_PRECISION>(rand())/static_cast<PRISMATIC_FLOAT_PRECISION> (RAND_MAX) <= occ[atom_num]) {
 							const size_t cur_Z = Z_lookup[ID[atom_num]];
 							PRISMATIC_FLOAT_PRECISION X, Y;
 							if (pars.meta.includeThermalEffects)
 							{ // apply random perturbations
-                                PRISMATIC_FLOAT_PRECISION perturbX = randn(de) * sigma[atom_num];
-                                PRISMATIC_FLOAT_PRECISION perturbY = randn(de) * sigma[atom_num];
+                                PRISMATIC_FLOAT_PRECISION perturbX = randn(thread_rng) * sigma[atom_num];
+                                PRISMATIC_FLOAT_PRECISION perturbY = randn(thread_rng) * sigma[atom_num];
 								X = round((x[atom_num] + perturbX) / pars.pixelSize[1]);
 								Y = round((y[atom_num] + perturbY) / pars.pixelSize[0]);
 							}
@@ -422,7 +430,6 @@ void generateProjectedPotentials3D(Parameters<PRISMATIC_FLOAT_PRECISION> &pars,
 	std::cout << "Base random seed = " << pars.meta.randomSeed << std::endl;
 	for (long t = 0; t < numWorkers; t++)
 	{
-		std::cout << "Launching thread #" << t << " to compute projected potential slices\n";
 		workers.push_back(thread([&pars, &x, &y, &z, &ID, &sigma, &occ, &print_frequency,
 								 &Z_lookup, &xvec, &yvec, &zvec, &zr, &dim0, &dim1,
 								 &numPlanes, &potLookup, &rband, &qband, &qxShift, &qyShift, &dispatcher, &t]()
@@ -430,10 +437,16 @@ void generateProjectedPotentials3D(Parameters<PRISMATIC_FLOAT_PRECISION> &pars,
 			size_t currentAtom, stop;
 			currentAtom = stop = 0;
             // create a random number generator to simulate thermal effects
-            std::cout << "random seed = " << pars.meta.randomSeed + t * 10000 << std::endl;
-            srand(pars.meta.randomSeed+10000*t);
-            std::mt19937 de(pars.meta.randomSeed+10000*t);
-            normal_distribution<PRISMATIC_FLOAT_PRECISION> randn(0, 1);
+			unsigned int thread_seed = pars.meta.randomSeed + static_cast<unsigned int>(10000 * t);
+
+			std::ostringstream oss;
+			oss << "Launched thread #" << t << " to compute projected potential slices with seed " << thread_seed << std::endl;
+			std::cout << oss.str();
+
+			boost::mt19937 thread_rng(thread_seed);
+			PRISMATIC_FLOAT_PRECISION zero = 0.0;
+			PRISMATIC_FLOAT_PRECISION one = 1.0;
+			boost::random::normal_distribution<PRISMATIC_FLOAT_PRECISION> randn(zero, one);
 
 			while (dispatcher.getWork(currentAtom, stop))
 			{
@@ -441,18 +454,19 @@ void generateProjectedPotentials3D(Parameters<PRISMATIC_FLOAT_PRECISION> &pars,
 				{
 					if(!(currentAtom % print_frequency))
 					{
-						std::cout << "Computing atom " << currentAtom << "/" << pars.atoms.size() << std::endl;
+						std::ostringstream oss;
+						oss << "Computing atom " << currentAtom << "/" << pars.atoms.size() << std::endl;
+						std::cout << oss.str();
 					}
-
 					
 					const size_t cur_Z = Z_lookup[ID[currentAtom]];
 					PRISMATIC_FLOAT_PRECISION X, Y, Z;
 					PRISMATIC_FLOAT_PRECISION perturbX, perturbY, perturbZ;
 					if (pars.meta.includeThermalEffects)
 					{ // apply random perturbations
-						perturbX = randn(de) * sigma[currentAtom];
-						perturbY = randn(de) * sigma[currentAtom];
-						perturbZ = randn(de) * sigma[currentAtom];
+						perturbX = randn(thread_rng) * sigma[currentAtom];
+						perturbY = randn(thread_rng) * sigma[currentAtom];
+						perturbZ = randn(thread_rng) * sigma[currentAtom];
 						X = round((x[currentAtom] + perturbX) / pars.pixelSize[1]);
 						Y = round((y[currentAtom] + perturbY) / pars.pixelSize[0]);
 						Z = (z[currentAtom] + perturbZ); //z gets rounded and normalized later

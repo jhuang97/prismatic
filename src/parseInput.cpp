@@ -20,6 +20,7 @@
 #include <map>
 #include <string>
 #include <stdlib.h>
+#include <cstdint>
 #ifdef _WIN32
 #include <cctype>
 #endif //_WIN32
@@ -73,7 +74,7 @@ void printHelp()
               << "* --probe-step (-r) step_size : step size of the probe for both X and Y directions (in Angstroms) (default: " << defaults.probeStepX << ")\n"
               << "* --probe-step-x (-rx) step_size : step size of the probe in X direction (in Angstroms) (default: " << defaults.probeStepX << ")\n"
               << "* --probe-step-y (-ry) step_size : step size of the probe in Y direction (in Angstroms) (default: " << defaults.probeStepY << ")\n"
-              << "* --random-seed (-rs) step_size : random integer number seed\n"
+              << "* --random-seed (-rs) unsigned 32-bit int : random integer number seed\n"
                  "* --probe-xtilt (-tx) value : probe X tilt (in mrad) (default: "
               << defaults.probeXtilt << ")\n"
               << "* --probe-ytilt (-ty) value : probe X tilt (in mrad) (default: " << defaults.probeYtilt << ")\n"
@@ -1012,9 +1013,20 @@ bool parse_rs(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
         cout << "No random seed provided for -rs (syntax is -rs integer)\n";
         return false;
     }
-    if (((meta.randomSeed = atoi((*argv)[1])) == 0) && std::string(((*argv)[1])) != "0")
-    {
-        cout << "Invalid value \"" << (*argv)[1] << "\" provided for random seed (syntax is -rs integer)\n";
+    std::string str = std::string(((*argv)[1]));
+    try {
+        unsigned long ul_val = std::stoul(str);
+        if (ul_val > UINT32_MAX) {
+            cout << "Out-of-range value \"" << str << "\" provided for random seed (syntax is -rs integer)\n";
+            return false;
+        }
+        uint32_t initial_seed = static_cast<uint32_t>(ul_val);
+        std::cout << "Initial seed (parsed): " << initial_seed << std::endl;
+        meta.rng = boost::ranlux3(initial_seed);
+        meta.reseed();
+    }
+    catch (const std::invalid_argument& e) {
+        cout << "Invalid value \"" << str << "\" provided for random seed (syntax is -rs integer)\n";
         return false;
     }
     argc -= 2;
