@@ -178,7 +178,7 @@ void generateProjectedPotentials(Parameters<PRISMATIC_FLOAT_PRECISION> &pars,
 	for (long t = 0; t < pars.meta.numThreads; ++t)
 	{
 		workers.push_back(thread([&pars, &x, &y, &z, &ID, &Z_lookup, &xvec, &sigma, &occ,
-								  &zPlane, &yvec, &potentialLookup, &dispatcher, &t]()
+								  &zPlane, &yvec, &potentialLookup, &dispatcher, t]()
 		{
 			// create a random number generator to simulate thermal effects
 			// std::cout<<"random seed = " << pars.meta.randomSeed << std::endl;
@@ -432,7 +432,7 @@ void generateProjectedPotentials3D(Parameters<PRISMATIC_FLOAT_PRECISION> &pars,
 	{
 		workers.push_back(thread([&pars, &x, &y, &z, &ID, &sigma, &occ, &print_frequency,
 								 &Z_lookup, &xvec, &yvec, &zvec, &zr, &dim0, &dim1,
-								 &numPlanes, &potLookup, &rband, &qband, &qxShift, &qyShift, &dispatcher, &t]()
+								 &numPlanes, &potLookup, &rband, &qband, &qxShift, &qyShift, &dispatcher, t]()
 		{
 			size_t currentAtom, stop;
 			currentAtom = stop = 0;
