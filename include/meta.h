@@ -118,6 +118,8 @@ namespace Prismatic{
             algorithm             = Algorithm::PRISM;
             potential3D           = true; //
             includeThermalEffects = true; //
+            defocusSpread         = 0.0;
+            sourceSize            = 0.0;
             includeOccupancy      = true; //
             alsoDoCPUWork         = true; // 
             save2DOutput          = false; //
@@ -227,6 +229,8 @@ namespace Prismatic{
         Algorithm algorithm;
         bool potential3D;
         bool includeThermalEffects;
+        T defocusSpread;
+        T sourceSize;
         bool includeOccupancy;
         bool alsoDoCPUWork; // what fraction of computation to do on the cpu vs gpu
         bool save2DOutput;
@@ -350,6 +354,8 @@ namespace Prismatic{
         std::cout << std::boolalpha << std::endl;
         std::cout << "potential3D = " << potential3D << std::endl;
         std::cout << "includeThermalEffects = " << includeThermalEffects << std::endl;
+        std::cout << "defocusSpread = " << defocusSpread << std::endl;
+        std::cout << "sourceSize = " << sourceSize << std::endl;
         std::cout << "includeOccupancy = " << includeOccupancy << std::endl;
         std::cout << "alsoDoCPUWork = " << alsoDoCPUWork << std::endl;
         std::cout << "save2DOutput = " << save2DOutput << std::endl;
@@ -470,6 +476,8 @@ namespace Prismatic{
         if(randomSeed != other.randomSeed)return false;
         if(crop4Damax != other.crop4Damax)return false;
         if(includeThermalEffects != other.includeThermalEffects)return false;
+        if(defocusSpread != other.defocusSpread)return false;
+        if(sourceSize != other.sourceSize)return false;
         if(includeOccupancy != other.includeOccupancy)return false;
         if(alsoDoCPUWork != other.alsoDoCPUWork)return false;
         if(save2DOutput != other.save2DOutput)return false;

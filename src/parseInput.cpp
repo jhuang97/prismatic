@@ -90,6 +90,10 @@ void printHelp()
               << ")\n"
               << "* --num-FP (-F) value : number of frozen phonon configurations to calculate (default: " << defaults.numFP << ")\n"
               << "* --thermal-effects (-te) bool : whether or not to include Debye-Waller factors (thermal effects) (default: True)\n"
+              << "* --defocus-spread (-dsr) sigma : Simulate defocus spread for multislice simulations by perturbing, for each frozen phonon configuration,\n"
+                << "the probe defocus by a random amount drawn from a normal distribution with standard deviation of sigma (in angstroms) (default: " << defaults.defocusSpread << ")\n"
+              << "* --source-size (-ss) sigma : Simulate effective source size for multislice simulations by perturbing, for each frozen phonon configuration,\n"
+                << "the x and y coordinates of all probe positions by a random amount drawn from a normal distribution with standard deviation of sigma (in angstroms) (default: " << defaults.sourceSize << ")\n"
               << "* --occupancy (-oc) bool : whether or not to consider occupancy values for likelihood of atoms existing at each site (default: True)\n"
               << "* --3Dpotential (-3DP) bool : whether or not to use 3D integration with subpixel shifting for calculating the atomic potentials (default: True)\n"
               << "* --save-2D-output (-2D) ang_min ang_max : save the 2D STEM image integrated between ang_min and ang_max (in mrads) (default: Off)\n"
@@ -292,6 +296,8 @@ bool writeParamFile(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
     }
 
     f << "--thermal-effects:" << meta.includeThermalEffects << "\n";
+    f << "--defocus-spread:" << meta.defocusSpread << "\n";
+    f << "--source-size:" << meta.sourceSize << "\n";
     f << "--occupancy:"<< meta.includeOccupancy << "\n";
     f << "--save-3D-output:" << meta.save3DOutput << "\n";
     f << "--save-4D-output:" << meta.save4DOutput << "\n";
@@ -1299,6 +1305,44 @@ bool parse_te(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
     return true;
 };
 
+bool parse_dsr(Metadata<PRISMATIC_FLOAT_PRECISION>& meta,
+    int& argc, const char*** argv)
+{
+    if (argc < 2)
+    {
+        cout << "No value provided for -dsr (syntax is -dsr value (in angstroms); value must be non-negative)\n";
+        return false;
+    }
+    if (((meta.defocusSpread = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1])) == 0)
+        && !parses_to_0_float(std::string((*argv)[1])) || meta.defocusSpread < 0)
+    {
+        cout << "Invalid value \"" << (*argv)[1] << "\" provided for -dsr (syntax is -dsr value (in angstroms); value must be non-negative)\n";
+        return false;
+    }
+    argc -= 2;
+    argv[0] += 2;
+    return true;
+};
+
+bool parse_ss(Metadata<PRISMATIC_FLOAT_PRECISION>& meta,
+    int& argc, const char*** argv)
+{
+    if (argc < 2)
+    {
+        cout << "No value provided for -ss (syntax is -ss value (in angstroms); value must be non-negative)\n";
+        return false;
+    }
+    if (((meta.sourceSize = (PRISMATIC_FLOAT_PRECISION)atof((*argv)[1])) == 0)
+        && !parses_to_0_float(std::string((*argv)[1])) || meta.sourceSize < 0)
+    {
+        cout << "Invalid value \"" << (*argv)[1] << "\" provided for -ss (syntax is -ss value (in angstroms); value must be non-negative)\n";
+        return false;
+    }
+    argc -= 2;
+    argv[0] += 2;
+    return true;
+};
+
 bool parse_oc(Metadata<PRISMATIC_FLOAT_PRECISION> &meta,
               int &argc, const char ***argv)
 {
@@ -1879,6 +1923,8 @@ static std::map<std::string, parseFunction> parser{
     {"--tile-uc", parse_t}, {"-t", parse_t},
     {"--num-FP", parse_F}, {"-F", parse_F},
     {"--thermal-effects", parse_te}, {"-te", parse_te},
+    {"--defocus-spread", parse_dsr}, {"-dsr", parse_dsr},
+    {"--source-size", parse_ss}, {"-ss", parse_ss},
     {"--occupancy", parse_oc}, {"-oc", parse_oc},
     {"--3Dpotential", parse_3DP}, {"-3DP", parse_3DP},
     {"--save-2D-output", parse_2D}, {"-2D", parse_2D},
