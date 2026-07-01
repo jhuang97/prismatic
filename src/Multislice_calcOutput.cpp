@@ -26,6 +26,7 @@
 #include "WorkDispatcher.h"
 #include "Multislice_calcOutput.h"
 #include "fileIO.h"
+#include <boost/random/normal_distribution.hpp>
 
 namespace Prismatic{
 	using namespace std;
@@ -225,6 +226,25 @@ namespace Prismatic{
 		{
             setupProbeOutput(pars);
             saveProbe(pars);
+		}
+
+		if (pars.meta.defocusSpread > 0) {
+			PRISMATIC_FLOAT_PRECISION zero = 0.0;
+			boost::random::normal_distribution<PRISMATIC_FLOAT_PRECISION> randn(zero, pars.meta.defocusSpread);
+			PRISMATIC_FLOAT_PRECISION zPerturb = randn(pars.meta.rng);
+			cout << "zPerturb: " << zPerturb << std::endl;
+
+			for (auto y = 0; y < pars.qMask.get_dimj(); ++y) {
+				for (auto x = 0; x < pars.qMask.get_dimi(); ++x) {
+					if (pars.qMask.at(y, x) == 1)
+					{
+						PRISMATIC_FLOAT_PRECISION angle = -pi * pars.lambda * pars.q2.at(y, x) * zPerturb +
+							2 * pi * zPerturb *
+							(pars.qx[x] * tan(pars.meta.probeXtilt) + pars.qy[y] * tan(pars.meta.probeYtilt));
+						pars.psiProbeInit.at(y, x) *= exp(i * angle);
+					}
+				}
+			}
 		}
 	}
 
