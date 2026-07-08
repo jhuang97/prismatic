@@ -56,8 +56,8 @@ void setup4DOutput(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 	data_dims[1] = {pars.numYprobes};
 	hsize_t chunkDims[4];
 	chunkDims[0] = chunkDims[1] = {1};
-	hsize_t rx_dim[1] = {pars.xp.size()};
-	hsize_t ry_dim[1] = {pars.yp.size()};
+	hsize_t rx_dim[1] = {pars.xp0.size()};
+	hsize_t ry_dim[1] = {pars.yp0.size()};
 	hsize_t qx_dim[1];
 	hsize_t qy_dim[1];
 
@@ -183,8 +183,8 @@ void setup4DOutput(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 		H5::DataSpace str_name_ds(H5S_SCALAR);
 		H5::StrType strdatatype(H5::PredType::C_S1, 256);
 
-		writeRealDataSet_inOrder(CBED_slice_n, "dim1", &pars.xp[0], rx_dim, 1);
-		writeRealDataSet_inOrder(CBED_slice_n, "dim2", &pars.yp[0], ry_dim, 1);
+		writeRealDataSet_inOrder(CBED_slice_n, "dim1", &pars.xp0[0], rx_dim, 1);
+		writeRealDataSet_inOrder(CBED_slice_n, "dim2", &pars.yp0[0], ry_dim, 1);
 		writeRealDataSet_inOrder(CBED_slice_n, "dim3", &qx[offset_qx], qx_dim, 1);
 		writeRealDataSet_inOrder(CBED_slice_n, "dim4", &qy[offset_qy], qy_dim, 1);
 
@@ -226,8 +226,8 @@ void setupVDOutput(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 	data_dims[1] = {pars.numYprobes};
 	data_dims[2] = {pars.Ndet};
 
-	hsize_t rx_dim[1] = {pars.xp.size()};
-	hsize_t ry_dim[1] = {pars.yp.size()};
+	hsize_t rx_dim[1] = {pars.xp0.size()};
+	hsize_t ry_dim[1] = {pars.yp0.size()};
 	hsize_t bin_dim[1] = {pars.Ndet};
 
 	for (auto n = 0; n < pars.numLayers; n++)
@@ -252,8 +252,8 @@ void setupVDOutput(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 		mspace.close();
 
 		//write dimensions
-		writeRealDataSet_inOrder(VD_slice_n, "dim1", &pars.xp[0], rx_dim, 1);
-		writeRealDataSet_inOrder(VD_slice_n, "dim2", &pars.yp[0], ry_dim, 1);
+		writeRealDataSet_inOrder(VD_slice_n, "dim1", &pars.xp0[0], rx_dim, 1);
+		writeRealDataSet_inOrder(VD_slice_n, "dim2", &pars.yp0[0], ry_dim, 1);
 		writeRealDataSet_inOrder(VD_slice_n, "dim3", &pars.detectorAngles[0], bin_dim, 1);
 
 		//dimension attribute
@@ -289,8 +289,8 @@ void setup2DOutput(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 	data_dims[0] = {pars.numXprobes};
 	data_dims[1] = {pars.numYprobes};
 
-	hsize_t rx_dim[1] = {pars.xp.size()};
-	hsize_t ry_dim[1] = {pars.yp.size()};
+	hsize_t rx_dim[1] = {pars.xp0.size()};
+	hsize_t ry_dim[1] = {pars.yp0.size()};
 
 	for (auto n = 0; n < pars.numLayers; n++)
 	{
@@ -311,8 +311,8 @@ void setup2DOutput(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 		mspace.close();
 
 		//write dimensions
-		writeRealDataSet_inOrder(annular_slice_n, "dim1", &pars.xp[0], rx_dim, 1);
-		writeRealDataSet_inOrder(annular_slice_n, "dim2", &pars.yp[0], ry_dim, 1);
+		writeRealDataSet_inOrder(annular_slice_n, "dim1", &pars.xp0[0], rx_dim, 1);
+		writeRealDataSet_inOrder(annular_slice_n, "dim2", &pars.yp0[0], ry_dim, 1);
 
 		//dimension attribute
 		H5::DataSet dim1 = annular_slice_n.openDataSet("dim1");
@@ -345,8 +345,8 @@ void setupDPCOutput(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 	data_dims[1] = {pars.numYprobes};
 	data_dims[2] = {2};
 
-	hsize_t rx_dim[1] = {pars.xp.size()};
-	hsize_t ry_dim[1] = {pars.yp.size()};
+	hsize_t rx_dim[1] = {pars.xp0.size()};
+	hsize_t ry_dim[1] = {pars.yp0.size()};
 	hsize_t str_dim[1] = {2};
 
 	for (auto n = 0; n < pars.numLayers; n++)
@@ -366,8 +366,8 @@ void setupDPCOutput(Parameters<PRISMATIC_FLOAT_PRECISION> &pars)
 		mspace.close();
 
 		//write dimensions
-		writeRealDataSet_inOrder(DPC_CoM_slice_n, "dim1", &pars.xp[0], rx_dim, 1);
-		writeRealDataSet_inOrder(DPC_CoM_slice_n, "dim2", &pars.yp[0], ry_dim, 1);
+		writeRealDataSet_inOrder(DPC_CoM_slice_n, "dim1", &pars.xp0[0], rx_dim, 1);
+		writeRealDataSet_inOrder(DPC_CoM_slice_n, "dim2", &pars.yp0[0], ry_dim, 1);
 
 		H5::StrType strdatatype(H5::PredType::C_S1, 256);
 		H5::DataSpace dim3_mspace(1, str_dim);

@@ -77,11 +77,25 @@ namespace Prismatic{
 			pars.numProbes = xp_d.size()*yp_d.size();
 		}
 
-		Array1D<PRISMATIC_FLOAT_PRECISION> xp(xp_d, {{xp_d.size()}});
-		Array1D<PRISMATIC_FLOAT_PRECISION> yp(yp_d, {{yp_d.size()}});
+		Array1D<PRISMATIC_FLOAT_PRECISION> xp0(xp_d, {{xp_d.size()}});
+		Array1D<PRISMATIC_FLOAT_PRECISION> yp0(yp_d, {{yp_d.size()}});
 
-		pars.xp = xp;
-		pars.yp = yp;
+		pars.xp0 = xp0;
+		pars.yp0 = yp0;
+		if (pars.meta.sourceSize > 0) {
+			PRISMATIC_FLOAT_PRECISION zero = 0.0;
+			boost::random::normal_distribution<PRISMATIC_FLOAT_PRECISION> randn(zero, pars.meta.sourceSize);
+			PRISMATIC_FLOAT_PRECISION xPerturb = randn(pars.meta.rng);
+			PRISMATIC_FLOAT_PRECISION yPerturb = randn(pars.meta.rng);
+			cout << "xPerturb, yPerturb: " << xPerturb << ", " << yPerturb << endl;
+			pars.xp = xp0 + xPerturb;
+			pars.yp = yp0 + yPerturb;
+		}
+		else {
+			pars.xp = xp0;
+			pars.yp = yp0;
+		}
+
 		pars.imageSize[0] = pars.pot.get_dimj();
 		pars.imageSize[1] = pars.pot.get_dimi();
 		Array1D<PRISMATIC_FLOAT_PRECISION> qx = makeFourierCoords(pars.imageSize[1], pars.pixelSize[1]);

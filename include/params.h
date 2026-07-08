@@ -92,6 +92,8 @@ namespace Prismatic{
 		Array2D<T> qTheta;
         Array1D<T> xp;
         Array1D<T> yp;
+		Array1D<T> xp0;
+		Array1D<T> yp0;
 		Array1D<T> qx;
 		Array1D<T> qy;
         std::vector<size_t> beamsIndex;
